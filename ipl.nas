@@ -1,7 +1,7 @@
 ; hello-os
 ; TAB=4
 
-		ORG		0x7c00			; 指明程序装载地址
+		ORG		0x7c00			; 指明程序装载到内存的地址
 
 ; 标准FAT12格式软盘专用的代码 Stand FAT12 format floppy code
 
@@ -43,7 +43,7 @@ putloop:
 		JE		fin
 		MOV		AH,0x0e			; 显示一个文字
 		MOV		BX,15			; 指定字符颜色
-		INT		0x10			; 调用显卡BIOS
+		INT		0x10			; INT-interrupt(中断指令)调用BIOS中的控制显卡函数(basic input output system)
 		JMP		putloop
 fin:
 		HLT						; 让CPU停止，等待指令
