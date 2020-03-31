@@ -1,39 +1,85 @@
+TOOLPATH = ../z_tools/
+INCPATH  = ../z_tools/haribote/
+
+MAKE     = $(TOOLPATH)make.exe -r
+NASK     = $(TOOLPATH)nask.exe
+CC1      = $(TOOLPATH)cc1.exe -I$(INCPATH) -Os -Wall -quiet
+GAS2NASK = $(TOOLPATH)gas2nask.exe -a
+OBJ2BIM  = $(TOOLPATH)obj2bim.exe
+BIM2HRB  = $(TOOLPATH)bim2hrb.exe
+RULEFILE = $(TOOLPATH)haribote/haribote.rul
+EDIMG    = $(TOOLPATH)edimg.exe
+IMGTOL   = $(TOOLPATH)imgtol.com
+COPY     = copy
+DEL      = del
 
 # 默认动作
 
 default :
-	../z_tools/make.exe img
+	$(MAKE) img
 
 # 镜像文件生成
 
 ipl.bin : ipl.nas Makefile
-	../z_tools/nask.exe ipl.nas ipl.bin ipl.lst
+	$(NASK) ipl.nas ipl.bin ipl.lst
 
-ipl.img : ipl.bin Makefile
-	../z_tools/edimg.exe   imgin:../z_tools/fdimg0at.tek \
-		wbinimg src:ipl.bin len:512 from:0 to:0   imgout:ipl.img
+asmhead.bin : asmhead.nas Makefile
+	$(NASK) asmhead.nas asmhead.bin asmhead.lst
+
+bootpack.gas : bootpack.c Makefile
+	$(CC1) -o bootpack.gas bootpack.c
+
+bootpack.nas : bootpack.gas Makefile
+	$(GAS2NASK) bootpack.gas bootpack.nas
+
+bootpack.obj : bootpack.nas Makefile
+	$(NASK) bootpack.nas bootpack.obj bootpack.lst
+
+naskfunc.obj : naskfunc.nas Makefile
+	$(NASK) naskfunc.nas naskfunc.obj naskfunc.lst
+
+bootpack.bim : bootpack.obj naskfunc.obj Makefile
+	$(OBJ2BIM) @$(RULEFILE) out:bootpack.bim stack:3136k map:bootpack.map \
+		bootpack.obj naskfunc.obj
+# 3MB+64KB=3136KB
+
+bootpack.hrb : bootpack.bim Makefile
+	$(BIM2HRB) bootpack.bim bootpack.hrb 0
+
+antos.sys : asmhead.bin bootpack.hrb Makefile
+	copy /B asmhead.bin+bootpack.hrb antos.sys
+
+antos.img : ipl.bin antos.sys Makefile
+	$(EDIMG)   imgin:../z_tools/fdimg0at.tek \
+		wbinimg src:ipl.bin len:512 from:0 to:0 \
+		copy from:antos.sys to:@: \
+		imgout:antos.img
 
 # 其他指令
 
-asm :
-	../z_tools/make.exe -r ipl.bin
-
 img :
-	../z_tools/make.exe -r ipl.img
+	$(MAKE) antos.img
 
 run :
-	../z_tools/make.exe img
-	copy ipl.img ..\z_tools\qemu\fdimage0.bin
-	../z_tools/make.exe -C ../z_tools/qemu
+	$(MAKE) img
+	$(COPY) antos.img ..\z_tools\qemu\fdimage0.bin
+	$(MAKE) -C ../z_tools/qemu
 
 install :
-	../z_tools/make.exe img
-	../z_tools/imgtol.com w a: ipl.img
+	$(MAKE) img
+	$(IMGTOL) w a: antos.img
 
 clean :
-	-del ipl.bin
-	-del ipl.lst
+	-$(DEL) *.bin
+	-$(DEL) *.lst
+	-$(DEL) *.gas
+	-$(DEL) *.obj
+	-$(DEL) bootpack.nas
+	-$(DEL) bootpack.map
+	-$(DEL) bootpack.bim
+	-$(DEL) bootpack.hrb
+	-$(DEL) antos.sys
 
 src_only :
-	../z_tools/make.exe clean
-	-del ipl.img
+	$(MAKE) clean
+	-$(DEL) antos.img
