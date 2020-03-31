@@ -1,4 +1,4 @@
-; haribote-ipl
+; antOS-ipl
 ; TAB=4
 
 CYLS	EQU		10				; 声明CYLS=10, EQU(equal 类似于c的#define)

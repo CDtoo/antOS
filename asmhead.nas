@@ -1,4 +1,4 @@
-; haribote-os boot asm
+; antOS boot asm
 ; TAB=4
 
 BOTPAK	EQU		0x00280000		; 加载bootpack

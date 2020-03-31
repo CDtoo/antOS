@@ -2,6 +2,7 @@
 ; TAB=4
 
 [FORMAT "WCOFF"]				; 制作目标文件的模式	
+[INSTRSET "i486p"]				; 使用到486为止的指令
 [BITS 32]						; 制作32位模式用的机器语言
 
 
@@ -10,6 +11,7 @@
 [FILE "naskfunc.nas"]			; 源文件名信息
 
 		GLOBAL	_io_hlt			; 程序中包含的函数名
+		GLOBAL  _w_mem8
 
 
 ; 以下是实际的函数
@@ -18,4 +20,9 @@
 
 _io_hlt:	; void io_hlt(void);
 		HLT
+		RET
+_w_mem8:    ; void w_mem8(int addr, int data);
+        MOV ECX, [ESP+4]
+		MOV AL, [ESP+8]
+		MOV [ECX], AL
 		RET
