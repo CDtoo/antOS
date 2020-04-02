@@ -1,4 +1,4 @@
-; antOS boot asm
+; haribote-os boot asm
 ; TAB=4
 
 BOTPAK	EQU		0x00280000		; 加载bootpack
@@ -15,7 +15,7 @@ VRAM	EQU		0x0ff8			; 图像缓冲区的起始地址
 
 		ORG		0xc200			;  这个的程序要被装载的内存地址
 
-; 画面设定模式
+; 画面モードを設定
 
 		MOV		AL,0x13			; VGA显卡，320x200x8bit
 		MOV		AH,0x00

@@ -1,7 +1,7 @@
-; antOS-ipl
+; haribote-ipl
 ; TAB=4
 
-CYLS	EQU		10				; 声明CYLS=10, EQU(equal 类似于c的#define)
+CYLS	EQU		10				; 声明CYLS=10
 
 		ORG		0x7c00			; 指明程序装载地址
 
@@ -9,7 +9,7 @@ CYLS	EQU		10				; 声明CYLS=10, EQU(equal 类似于c的#define)
 
 		JMP		entry
 		DB		0x90
-		DB		"antOSIPL"		; 启动扇区名称（8字节）
+		DB		"HARIBOTE"		; 启动扇区名称（8字节）
 		DW		512				; 每个扇区（sector）大小（必须512字节）
 		DB		1				; 簇（cluster）大小（必须为1个扇区）
 		DW		1				; FAT起始位置（一般为第一个扇区）
@@ -24,7 +24,7 @@ CYLS	EQU		10				; 声明CYLS=10, EQU(equal 类似于c的#define)
 		DD		2880			; 重写一次磁盘大小
 		DB		0,0,0x29		; 意义不明（固定）
 		DD		0xffffffff		; （可能是）卷标号码
-		DB		"---antOS---"	; 磁盘的名称（必须为11字?，不足填空格）
+		DB		"HARIBOTEOS "	; 磁盘的名称（必须为11字?，不足填空格）
 		DB		"FAT12   "		; 磁盘格式名称（必??8字?，不足填空格）
 		RESB	18				; 先空出18字节
 
@@ -77,8 +77,8 @@ next:
 		CMP		CH,CYLS
 		JB		readloop		; CH < CYLS 跳转到readloop
 
-; 读取完毕，跳转到antos.sys执行！
-		MOV		[0x0ff0],CH		; 请注意IPL已读多远
+; 读取完毕，跳转到haribote.sys执行！
+		MOV		[0x0ff0],CH		; IPLがどこまで読んだのかをメモ
 		JMP		0xc200
 
 error:
