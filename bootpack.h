@@ -1,3 +1,6 @@
+#ifndef BOOTPACK_H
+#define BOOTPACK_H
+#endif
 /* asmhead.nas */
 struct BOOTINFO { /* 0x0ff0-0x0fff */
 	char cyls; /* 启动区读磁盘读到此为止 */
@@ -7,12 +10,23 @@ struct BOOTINFO { /* 0x0ff0-0x0fff */
 	short scrnx, scrny; /* 画面分辨率 */
 	char *vram;
 };
+struct KEYBUF
+{
+	/* data */
+	unsigned char data[4];
+	unsigned char flag;   //0,缓存区为空 1-缓冲区有数据
+};
+
+#define PORT_KEYDAT   0x0060   //从编号0x0060的设备输入的8位信息是按键编码
 #define ADR_BOOTINFO	0x00000ff0
+
 
 /* naskfunc.nas */
 void io_hlt(void);
 void io_cli(void);
 void io_sti(void);
+void io_stihlt(void);
+char io_in8(int port);
 void io_out8(int port, int data);
 int io_load_eflags(void);
 void io_store_eflags(int eflags);

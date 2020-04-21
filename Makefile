@@ -75,6 +75,10 @@ run :
 	$(COPY) haribote.img ..\z_tools\qemu\fdimage0.bin
 	$(MAKE) -C ../z_tools/qemu
 
+rr :
+	$(COPY) haribote.img ..\z_tools\qemu\fdimage0.bin
+	$(MAKE) -C ../z_tools/qemu
+
 install :
 	$(MAKE) img
 	$(IMGTOL) w a: haribote.img

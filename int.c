@@ -1,7 +1,9 @@
 /*初始化关系 */
 
 #include "bootpack.h"
+#include <stdio.h>
 
+struct KEYBUF keybuf;
 void init_pic(void)
 /* PIC初始化 */
 {
@@ -28,8 +30,19 @@ void inthandler21(int *esp)
 /* 来自PS/2键盘的中断 */
 {
 	struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
+	unsigned char data, s[4];
+	io_out8(PIC0_OCW2, 0x61); //通知pic irq-01已经受理完毕
+	data = io_in8(PORT_KEYDAT);
+	if(keybuf.flag == 0)
+	{
+		keybuf.data = data;
+		keybuf.flag = 1;
+	}
+	return;
+
+	sprintf(s, "%2X", data);
 	boxfill8(binfo->vram, binfo->scrnx, COL8_000000, 0, 0, 32 * 8 - 1, 15);
-	putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, "INT 21 (IRQ-1) : PS/2 keyboard");
+	putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
 	for (;;) {
 		io_hlt();
 	}
